@@ -1,0 +1,9 @@
+{
+  "type": "pipeline",
+  "name": "triangle",
+  "tags": [ "kek", "lol" ],
+  "files": {
+    "vert": "triangle.vert.spv",
+    "frag": "triangle.frag.spv"
+  }
+}
