@@ -18,7 +18,7 @@ const Type & operator=( const Type & ) = delete;
 	protected:
 		HandleType m_handle;
 
-		HandleBase() = default;
+		HandleBase() { m_handle = {}; };
 
 	public:
 		HandleType GetHandle() const noexcept { return m_handle; }

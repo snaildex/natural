@@ -35,12 +35,12 @@ namespace natural {
 		void* pUserData) {
 		const char* severity = nullptr;
 		switch (messageSeverity) {
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: severity = "verbose";
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: severity = "info";
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: severity = "warning";
-		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: severity = "error";
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: severity = "verbose"; break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: severity = "info"; break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: severity = "warning"; break;
+		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: severity = "error"; break;
 		}
-		___Log("vulkan", -1, "[%s] %s", severity, pCallbackData->pMessage);
+		___DLog("vulkan", -1, "[%s] %s", severity, pCallbackData->pMessage);
 		return VK_FALSE;
 	}
 

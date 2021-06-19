@@ -66,6 +66,6 @@ namespace natural {
 		VkDevice GetVkDevice() const noexcept { return m_device; }
 		VkQueue GetVkGraphicsQueue() const noexcept { return m_graphicsQueue; }
 		VkExtent2D GetSwapChainExtent() const noexcept { return m_swapChainExtent; }
-		VkFormat GetSwapChainImageFormat() const noexcept { return m_swapChainImageFormat; }
+		Format GetSwapChainImageFormat() const override { return m_swapChainImageFormat; }
 	};
 }

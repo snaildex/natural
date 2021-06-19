@@ -3,8 +3,9 @@
 #include "../../helpers/helpers.h"
 #include "../resource.h"
 namespace natural {
-	class Pipeline : public Resource {
+	class Shader : public Resource {
 	public:
+		virtual ~Shader() = default;
 		class Impl;
 	};
 }

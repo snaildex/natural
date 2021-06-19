@@ -1,5 +1,5 @@
 {
-  "type": "pipeline",
+  "type": "shader",
   "name": "triangle",
   "tags": [ "kek", "lol" ],
   "files": {

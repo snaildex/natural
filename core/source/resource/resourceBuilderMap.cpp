@@ -1,5 +1,5 @@
 #include "resourceBuilderMap.h"
-#include "pipeline/pipelineImpl.h"
+#include "resource/shader/shaderImpl.h"
 namespace natural {
 	typedef std::function<Resource * (Application::Impl*, const json&)> ResourceBuilder;
 	std::map<std::string, ResourceBuilder> ResourceBuilderMap;
@@ -13,7 +13,7 @@ namespace natural {
 	void RegisterResourceBuilder(const std::string& name) { AddResourceBuilder(name, T::Impl::Create); }
 
 	void RegisterResourceBuilders() {
-		RegisterResourceBuilder<Pipeline>("pipeline");
+		RegisterResourceBuilder<Shader>("shader");
 	}
 
 	Resource* BuildResource(Application::Impl* app, const json& config) {

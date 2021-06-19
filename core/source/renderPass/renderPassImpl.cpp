@@ -1,37 +1,45 @@
 #include "renderPassImpl.h"
 namespace natural {
-	RenderPass::Impl::Impl(Application::Impl* app)
-	{
+	RenderPass::Impl::Impl(
+		Application::Impl* app, const std::vector<AttachmentDesc>& attachments, const std::vector<SubpassDesc>& subpasses) {
 		m_app = app;
-		VkAttachmentDescription colorAttachment{};
-		colorAttachment.format = app->GetSwapChainImageFormat();
-		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-		VkAttachmentReference colorAttachmentRef{};
-		colorAttachmentRef.attachment = 0;
-		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-		VkSubpassDescription subpass{};
-		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.colorAttachmentCount = 1;
-		subpass.pColorAttachments = &colorAttachmentRef;
-
+		std::vector<VkAttachmentDescription> vkAttachments;
+		std::vector<VkSubpassDescription> vkSubpasses;
+		vkAttachments.resize(attachments.size());
+		for (int i = 0; i < vkAttachments.size(); ++i) {
+			vkAttachments[i] = {};
+			vkAttachments[i].format = (VkFormat)(int)attachments[i].Format;
+			vkAttachments[i].samples = VK_SAMPLE_COUNT_1_BIT;
+			vkAttachments[i].loadOp = (VkAttachmentLoadOp)(int)attachments[i].LoadOp;
+			vkAttachments[i].storeOp = (VkAttachmentStoreOp)(int)attachments[i].StoreOp;
+			vkAttachments[i].stencilLoadOp = (VkAttachmentLoadOp)(int)attachments[i].StencilLoadOp;
+			vkAttachments[i].stencilStoreOp = (VkAttachmentStoreOp)(int)attachments[i].StencilStoreOp;
+			vkAttachments[i].initialLayout = (VkImageLayout)(int)attachments[i].InitialLayout;
+			vkAttachments[i].finalLayout = (VkImageLayout)(int)attachments[i].FinalLayout;
+		}
+		vkSubpasses.resize(subpasses.size());
+		for (int i = 0; i < vkSubpasses.size(); ++i) {
+			vkSubpasses[i] = {};
+			vkSubpasses[i].pipelineBindPoint = (VkPipelineBindPoint)(int)subpasses[i].PipelineBindPoint;
+			vkSubpasses[i].colorAttachmentCount = subpasses[i].Attahcments.size();
+			auto atRef = new VkAttachmentReference[vkSubpasses[i].colorAttachmentCount];
+			for (int j = 0; j < subpasses[i].Attahcments.size(); ++j) {
+				atRef[j] = {};
+				atRef[j].attachment = subpasses[i].Attahcments[j].Index;
+				atRef[j].layout = (VkImageLayout)(int)subpasses[i].Attahcments[j].Layout;
+			}
+			vkSubpasses[i].pColorAttachments = atRef;
+		}
 		VkRenderPassCreateInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.attachmentCount = 1;
-		renderPassInfo.pAttachments = &colorAttachment;
-		renderPassInfo.subpassCount = 1;
-		renderPassInfo.pSubpasses = &subpass;
-
-		ThrowVk(vkCreateRenderPass(m_app->GetVkDevice(), &renderPassInfo, nullptr, &m_renderPass));
+		renderPassInfo.attachmentCount = vkAttachments.size();
+		renderPassInfo.pAttachments = vkAttachments.data();
+		renderPassInfo.subpassCount = vkSubpasses.size();
+		renderPassInfo.pSubpasses = vkSubpasses.data();
+		ThrowVk(vkCreateRenderPass(m_app->GetVkDevice(), &renderPassInfo, nullptr, &m_handle));
+		for (int i = 0; i < vkSubpasses.size(); ++i) delete[] vkSubpasses[i].pColorAttachments;
 	}
 	RenderPass::Impl::~Impl() {
-		vkDestroyRenderPass(m_app->GetVkDevice(), m_renderPass, nullptr);
+		vkDestroyRenderPass(m_app->GetVkDevice(), m_handle, nullptr);
 	}
 }

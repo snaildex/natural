@@ -3,5 +3,7 @@
 #include "helpers/helpers.h"
 #include "helpers/math3D.h"
 #include "application/application.h"
-#include "resource/pipeline/pipeline.h"
+#include "resource/shader/shader.h"
 #include "renderPass/renderPass.h"
+#include "pipeline/pipeline.h"
+#include "framebuffer/framebuffer.h"

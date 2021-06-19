@@ -1,11 +1,11 @@
 #pragma once
-#include "pipeline.h"
+#include "shader.h"
 #include "../../application/applicationImpl.h"
 #include "../resourceBuilderMap.h"
 #include <vulkan/vulkan.h>
 #include "../../helpers/vulkanHelpers.h"
 namespace natural {
-	class Pipeline::Impl : public Pipeline {
+	class Shader::Impl : public Shader {
 		enum class Stage {
 			Vertex = VK_SHADER_STAGE_VERTEX_BIT,
 			TessCtrl = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT,
@@ -18,13 +18,12 @@ namespace natural {
 		static std::map<std::string, Stage> m_stageNames;
 		std::map<Stage, fs::path> m_sources;
 		std::map<Stage, VkShaderModule> m_shaderModules;
-		VkPipelineLayout m_pipelineLayout;
-
 	protected:
 		void Load();
 		void Unload();
 	public:
 		Impl(Application::Impl* app, const json& config);
 		static Resource* Create(Application::Impl* app, const json& config);
+		const std::map<Stage, VkShaderModule>& GetShaderModules() const noexcept { return m_shaderModules; }
 	};
 }

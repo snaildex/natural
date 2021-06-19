@@ -96,7 +96,7 @@ namespace natural {
 				sprintf(LogBuf, "[%p][%s] ", std::this_thread::get_id(), buf);
 			LogFile << LogBuf;
 		}
-		for (int i = 0; i < LogIndentLevel; ++i) LogFile << "    ";
+		if (line >= 0) for (int i = 0; i < LogIndentLevel; ++i) LogFile << "    ";
 		va_list vargs;
 		va_start(vargs, fmt);
 		vsprintf(LogBuf, fmt, vargs);
