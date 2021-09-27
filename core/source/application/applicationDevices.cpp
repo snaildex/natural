@@ -1,6 +1,8 @@
 #include "applicationImpl.h"
 #include <vulkan/vulkan.h>
 #include "../helpers/vulkanHelpers.h"
+#include "../helpers/impl.h"
+#include "../semaphore/semaphoreImpl.h"
 
 namespace natural {
 	const std::vector<const char*> Application::Impl::DeviceExtensions = {
@@ -85,6 +87,7 @@ namespace natural {
 		for (const auto& device : devices)
 			if (IsDeviceSuitable(device) && m_physicalDevice == VK_NULL_HANDLE)
 				m_physicalDevice = device;
+		m_queueFamilyIndices = FindQueueFamilies(m_physicalDevice);
 	}
 
 	VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
@@ -134,9 +137,8 @@ namespace natural {
 		createInfo.imageExtent = extent;
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-		QueueFamilyIndices indices = FindQueueFamilies(m_physicalDevice);
-		uint32_t queueFamilyIndices[] = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
-		if (indices.GraphicsFamily != indices.PresentFamily) {
+		uint32_t queueFamilyIndices[] = { m_queueFamilyIndices.GraphicsFamily.value(), m_queueFamilyIndices.PresentFamily.value() };
+		if (m_queueFamilyIndices.GraphicsFamily != m_queueFamilyIndices.PresentFamily) {
 			createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 			createInfo.queueFamilyIndexCount = 2;
 			createInfo.pQueueFamilyIndices = queueFamilyIndices;

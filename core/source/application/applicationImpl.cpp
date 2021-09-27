@@ -76,7 +76,6 @@ namespace natural {
 		CreateLogicalDevice();
 		CreateSwapChain(width, height);
 		CreateImageViews();
-		CreateGraphicsPipeline();
 		ScanResources();
 		m_listener->Start();
 	}
@@ -103,10 +102,6 @@ namespace natural {
 		}
 	}
 
-	void Application::Impl::CreateGraphicsPipeline() {
-
-	}
-
 	Application::Impl::~Impl() {
 		m_listener.reset();
 		for (std::unique_ptr<Resource>& r : m_resources) {
@@ -129,9 +124,10 @@ namespace natural {
 	void Application::Impl::Run()
 	{
 		while (!glfwWindowShouldClose(m_window)) {
-			m_listener->Update();
 			glfwPollEvents();
+			m_listener->Update();
 		}
+		ThrowVk(vkDeviceWaitIdle(m_device));
 	}
 
 	Application* Application::Create(int width, int height, const std::string& name, ApplicationListener* listener)

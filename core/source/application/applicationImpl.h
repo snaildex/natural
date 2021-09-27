@@ -22,6 +22,7 @@ namespace natural {
 		VkDebugUtilsMessengerEXT m_debugMessenger;
 		VkPhysicalDevice m_physicalDevice;
 		VkDevice m_device;
+		QueueFamilyIndices m_queueFamilyIndices;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
 		GLFWwindow* m_window;
@@ -46,8 +47,7 @@ namespace natural {
 		void CreateLogicalDevice();
 		void CreateSwapChain(int width, int height);
 		void CreateImageViews();
-		void CreateGraphicsPipeline();
-
+		
 	public:
 #ifdef NDEBUG
 		static const bool EnableValidationLayers = false;
@@ -65,7 +65,12 @@ namespace natural {
 		VkPhysicalDevice GetVkPhysicalDevise() const noexcept { return m_physicalDevice; }
 		VkDevice GetVkDevice() const noexcept { return m_device; }
 		VkQueue GetVkGraphicsQueue() const noexcept { return m_graphicsQueue; }
+		VkQueue GetVkPresentQueue() const noexcept { return m_presentQueue; }
+		VkSwapchainKHR GetSwapChain() const noexcept { return m_swapChain; }
 		VkExtent2D GetSwapChainExtent() const noexcept { return m_swapChainExtent; }
 		Format GetSwapChainImageFormat() const override { return m_swapChainImageFormat; }
+		const std::vector<VkImage>& GetSwapChainImages() const noexcept { return m_swapChainImages; }
+		const std::vector<VkImageView>& GetSwapChainImageViews() const noexcept { return m_swapChainImageViews; }
+		const QueueFamilyIndices& GetQueueFamilyIndices() const noexcept { return m_queueFamilyIndices; }
 	};
 }

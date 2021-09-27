@@ -2,8 +2,17 @@
 using namespace natural;
 
 class TestApp : public ApplicationListener {
+	const int MaxFramesInFlight = 2;
 	std::unique_ptr<RenderPass> m_pass;
 	std::unique_ptr<Pipeline> m_pip;
+	std::vector<std::unique_ptr<Framebuffer>> m_fbufs;
+	std::unique_ptr<CommandPool> m_comPool;
+	std::vector<CommandBuffer*> m_comBufs;
+	std::vector<std::unique_ptr<Semaphore>> m_imageAvailable;
+	std::vector<std::unique_ptr<Semaphore>> m_renderFinished;
+	std::vector<std::unique_ptr<Fence>> m_inFlightFences;
+	std::vector<Fence*> m_imagesInFlight;
+	int m_currentFrame;
 public:
 	void Start() {
 		AttachmentDesc at;
@@ -15,10 +24,60 @@ public:
 		at.InitialLayout = ImageLayout::Undefined;
 		at.FinalLayout = ImageLayout::PresentSrcKhr;
 		std::vector<ColorAttachmentRef> refs = { {0, ImageLayout::ColorAttachmentOptimal} };
-		m_pass.reset(CreateRenderPass({ at }, { {PipelineBindPoint::Graphics, refs} }));
-		m_pip.reset(CreatePipeline(GetResource<Shader>("triangle"), m_pass.get(), 0));
+		std::unique_ptr<RenderPassBuilder> rpBuilder;
+		BuildRenderPass(rpBuilder);
+		rpBuilder->AddAttachment(at);
+		rpBuilder->AddSubpass({ PipelineBindPoint::Graphics, refs });
+		SubpassDependencyDesc dep;
+		dep.SrcSubpass = SubpassExternal;
+		dep.DstSubpass = 0;
+		dep.SrcStageMask = PipelineStage::ColorAttachmentOutput;
+		dep.SrcAccessMask = 0;
+		dep.DstStageMask = PipelineStage::ColorAttachmentOutput;
+		dep.DstAccessMask = Access::ColorAttachmentWrite;
+		dep.DependencyFlags = 0;
+		rpBuilder->AddSubpassDependency(dep);
+		rpBuilder->Build(m_pass);
+		CreatePipeline(m_pip, GetResource<Shader>("triangle"), m_pass.get(), 0);
+		CreateSwapchainFramebuffers(m_fbufs, m_pass.get());
+		CreateCommandPool(m_comPool);
+		m_imageAvailable.resize(MaxFramesInFlight);
+		m_renderFinished.resize(MaxFramesInFlight);
+		m_inFlightFences.resize(MaxFramesInFlight);
+		for (int i = 0; i < MaxFramesInFlight; ++i) {
+			CreateSemaphore(m_imageAvailable[i]);
+			CreateSemaphore(m_renderFinished[i]);
+			CreateFence(m_inFlightFences[i], true);
+		}
+		m_imagesInFlight.resize(m_fbufs.size(), nullptr);
+		m_comPool->CreatePrimaryBuffers(m_fbufs.size());
+		m_comBufs.resize(m_fbufs.size());
+		for (int i = 0; i < m_comBufs.size(); ++i) {
+			CommandBuffer* comBuf = m_comPool->GetPrimaryBuffer(i);
+			comBuf->Begin();
+			comBuf->CmdBeginRenderPass(
+				m_pass.get(),
+				m_fbufs[i].get(),
+				{ 0,0 },
+				{ 100,100 },
+				{ {0.0f,0.0f,0.0f,1.0f} });
+			comBuf->CmdBindPipeline(m_pip.get(), PipelineBindPoint::Graphics);
+			comBuf->CmdDraw(3, 1, 0, 0);
+			comBuf->CmdEndRenderPass();
+			comBuf->End();
+			m_comBufs[i] = comBuf;
+		}
+		m_currentFrame = 0;
 	}
 	void Update() {
+		Wait({ m_inFlightFences[m_currentFrame].get() });
+		uint32_t img = NextSwapChainImage(m_imageAvailable[m_currentFrame].get());
+		if (m_imagesInFlight[img]) Wait({ m_imagesInFlight[img] });
+		m_imagesInFlight[img] = m_inFlightFences[m_currentFrame].get();
+		m_inFlightFences[m_currentFrame]->Reset();
+		SubmitQueue({ {m_imageAvailable[m_currentFrame].get(), PipelineStage::ColorAttachmentOutput} }, { m_comBufs[img] }, { m_renderFinished[m_currentFrame].get() }, m_inFlightFences[m_currentFrame].get());
+		Present({ m_renderFinished[m_currentFrame].get() }, img);
+		m_currentFrame = (m_currentFrame + 1) % MaxFramesInFlight;
 	}
 };
 

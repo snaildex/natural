@@ -16,7 +16,7 @@ namespace natural {
 	};
 
 	bool ___CheckVk(const char* file, int line, VkResult code, const char* operation);
-	void ___ThrowVk(const char* file, int line, VkResult code, const char* operation);
+	VkResult ___ThrowVk(const char* file, int line, VkResult code, const char* operation);
 
 #define CheckVk(operation) natural::___CheckVk(natural::___StripFileName(__FILE__), __LINE__, operation, #operation)
 #define ThrowVk(operation) natural::___ThrowVk(natural::___StripFileName(__FILE__), __LINE__, operation, #operation)

@@ -8,10 +8,11 @@ namespace natural {
 		return true;
 	}
 
-	void ___ThrowVk(const char* file, int line, VkResult code, const char* operation)
+	VkResult ___ThrowVk(const char* file, int line, VkResult code, const char* operation)
 	{
-		if (code != VK_SUCCESS)
+		if (code != VK_SUCCESS && code != VK_TIMEOUT && code != VK_NOT_READY)
 			throw VulkanFailedOperationException(file, line, code, operation);
+		return code;
 	}
 
 	VulkanFailedOperationException::VulkanFailedOperationException(const char* file, int line, VkResult code, const char* operation)

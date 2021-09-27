@@ -1,14 +1,14 @@
 #pragma once
-#include "renderPass.h"
+#include "semaphore.h"
 #include "../application/applicationImpl.h"
 #include <vulkan/vulkan.h>
 #include "../helpers/vulkanHelpers.h"
 
 namespace natural {
-	class RenderPass::Impl : public RenderPass, public HandleBase<VkRenderPass> {
+	class Semaphore::Impl : public Semaphore, public HandleBase<VkSemaphore> {
 		Application::Impl* m_app;
 	public:
-		Impl(Application::Impl* app, const VkRenderPassCreateInfo& createInfo);
+		Impl(Application::Impl* app);
 		~Impl();
 	};
 }
