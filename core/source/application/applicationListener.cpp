@@ -21,9 +21,13 @@ namespace natural {
 	Format ApplicationListener::GetSwapChainImageFormat() {
 		return m_app->GetSwapChainImageFormat();
 	}
-	uint32_t ApplicationListener::NextSwapChainImage(Semaphore* semaphore) {
+	glm::uvec2 ApplicationListener::GetSwapChainExtent() {
+		auto ext =  impl(m_app)->GetSwapChainExtent();
+		return {ext.width, ext.height};
+	}
+	uint32_t ApplicationListener::NextSwapChainImage(Semaphore* semaphore, Fence* fence) {
 		uint32_t imageIndex = -1;
-		ThrowVk(vkAcquireNextImageKHR(impl(m_app)->GetVkDevice(), impl(m_app)->GetSwapChain(), UINT64_MAX, semaphore ? impl(semaphore)->GetHandle() : VK_NULL_HANDLE, VK_NULL_HANDLE, &imageIndex));
+		ThrowVk(vkAcquireNextImageKHR(impl(m_app)->GetVkDevice(), impl(m_app)->GetSwapChain(), UINT64_MAX, semaphore ? impl(semaphore)->GetHandle() : VK_NULL_HANDLE, fence ? impl(fence)->GetHandle() : VK_NULL_HANDLE, &imageIndex));
 		return imageIndex;
 	}
 	void ApplicationListener::CreatePipeline(std::unique_ptr<Pipeline>& pipeline, Shader* shader, RenderPass* renderPass, int subpass) {

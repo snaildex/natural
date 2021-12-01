@@ -40,7 +40,14 @@ namespace natural {
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: severity = "warning"; break;
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: severity = "error"; break;
 		}
-		___DLog("vulkan", -1, "[%s] %s", severity, pCallbackData->pMessage);
+		if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+			std::string msg = std::string(pCallbackData->pMessage);
+			msg = Replace(msg, " | ", "\n    ");
+			msg = std::string("\n    ") + Wrap(msg, 160, 4);
+			___DLog("vulkan", -1, "[%s] %s", severity, msg.data());
+		}
+		else
+			___DLog("vulkan", -1, "[%s] %s", severity, pCallbackData->pMessage);
 		return VK_FALSE;
 	}
 

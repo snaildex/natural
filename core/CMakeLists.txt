@@ -16,8 +16,14 @@ target_include_directories (core PUBLIC source)
 find_package(Vulkan REQUIRED)
 target_include_directories(core PRIVATE ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(core ${Vulkan_LIBRARIES})
-#target_link_libraries(core glfw assimp lua_static)
+
+find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(core glfw)
-#target_link_libraries (core Bullet3Common BulletCollision BulletDynamics BulletInverseDynamics BulletSoftBody LinearMath)
+
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(core glm::glm)
+
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(core nlohmann_json nlohmann_json::nlohmann_json)
 
 set_target_properties(core PROPERTIES VS_GLOBAL_ROOTNAMESPACE "ogele")

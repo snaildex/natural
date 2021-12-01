@@ -61,6 +61,42 @@ namespace natural {
 		return atoi(&str.data()[i + 1]);
 	}
 
+	std::string Replace(std::string subject, const std::string& search, const std::string& replace) {
+		size_t pos = 0;
+		while ((pos = subject.find(search, pos)) != std::string::npos) {
+			subject.replace(pos, search.length(), replace);
+			pos += replace.length();
+		}
+		return subject;
+	}
+
+	std::string Wrap(const std::string& text, size_t width, size_t indent) {
+		istringstream isstr(text);
+		ostringstream osstr;
+		string word;
+		size_t clinewidth = 0;
+		while (!isstr.eof()) {
+			isstr >> word;
+			if (word.size() >= width)
+				osstr << word << ' ';
+			else {
+				if (clinewidth + word.size() > width) {
+					osstr << '\n';
+					for (int i = 0; i < indent; ++i) osstr << ' ';
+					clinewidth = indent;
+				}
+				osstr << word << ' ';
+				clinewidth += word.size() + 1;
+				if (isstr.peek() == '\n' || isstr.peek() == '\r') {
+					osstr << '\n';
+					for (int i = 0; i < indent; ++i) osstr << ' ';
+					clinewidth = indent;
+				}
+			}
+		}
+		return osstr.str();
+	}
+
 	mutex LogLock;
 
 	int LogIndentLevel;

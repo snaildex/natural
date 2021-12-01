@@ -38,7 +38,8 @@ namespace natural {
 			}));
 		}
 		Format GetSwapChainImageFormat();
-		uint32_t NextSwapChainImage(Semaphore* semaphore);
+		glm::uvec2 GetSwapChainExtent();
+		uint32_t NextSwapChainImage(Semaphore* semaphore, Fence* fence);
 		void BuildRenderPass(std::unique_ptr<RenderPassBuilder>& renderPass);
 		void CreatePipeline(std::unique_ptr<Pipeline>& pipeline, Shader* shader, RenderPass* renderPass, int subpass);
 		void CreateSwapchainFramebuffers(std::vector<std::unique_ptr<Framebuffer>>& framebuffers, RenderPass* renderPass);

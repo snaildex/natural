@@ -13,6 +13,7 @@ class TestApp : public ApplicationListener {
 	std::vector<std::unique_ptr<Fence>> m_inFlightFences;
 	std::vector<Fence*> m_imagesInFlight;
 	int m_currentFrame;
+
 public:
 	void Start() {
 		AttachmentDesc at;
@@ -52,6 +53,7 @@ public:
 		m_imagesInFlight.resize(m_fbufs.size(), nullptr);
 		m_comPool->CreatePrimaryBuffers(m_fbufs.size());
 		m_comBufs.resize(m_fbufs.size());
+		glm::uvec2 resolution = GetSwapChainExtent();
 		for (int i = 0; i < m_comBufs.size(); ++i) {
 			CommandBuffer* comBuf = m_comPool->GetPrimaryBuffer(i);
 			comBuf->Begin();
@@ -59,7 +61,7 @@ public:
 				m_pass.get(),
 				m_fbufs[i].get(),
 				{ 0,0 },
-				{ 100,100 },
+				{ resolution.x,resolution.y },
 				{ {0.0f,0.0f,0.0f,1.0f} });
 			comBuf->CmdBindPipeline(m_pip.get(), PipelineBindPoint::Graphics);
 			comBuf->CmdDraw(3, 1, 0, 0);
@@ -71,11 +73,16 @@ public:
 	}
 	void Update() {
 		Wait({ m_inFlightFences[m_currentFrame].get() });
-		uint32_t img = NextSwapChainImage(m_imageAvailable[m_currentFrame].get());
+		uint32_t img = NextSwapChainImage(m_imageAvailable[m_currentFrame].get(), nullptr);
 		if (m_imagesInFlight[img]) Wait({ m_imagesInFlight[img] });
 		m_imagesInFlight[img] = m_inFlightFences[m_currentFrame].get();
 		m_inFlightFences[m_currentFrame]->Reset();
-		SubmitQueue({ {m_imageAvailable[m_currentFrame].get(), PipelineStage::ColorAttachmentOutput} }, { m_comBufs[img] }, { m_renderFinished[m_currentFrame].get() }, m_inFlightFences[m_currentFrame].get());
+		SubmitQueue(
+			{ {m_imageAvailable[m_currentFrame].get(), PipelineStage::ColorAttachmentOutput} },
+			{ m_comBufs[img] },
+			{ m_renderFinished[m_currentFrame].get() },
+			m_inFlightFences[m_currentFrame].get()
+		);
 		Present({ m_renderFinished[m_currentFrame].get() }, img);
 		m_currentFrame = (m_currentFrame + 1) % MaxFramesInFlight;
 	}
