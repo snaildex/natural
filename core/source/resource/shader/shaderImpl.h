@@ -16,7 +16,7 @@ namespace natural {
 		};
 		Application::Impl* m_app;
 		static std::map<std::string, Stage> m_stageNames;
-		std::map<Stage, fs::path> m_sources;
+		std::map<Stage, std::filesystem::path> m_sources;
 		std::map<Stage, VkShaderModule> m_shaderModules;
 	protected:
 		void Load();

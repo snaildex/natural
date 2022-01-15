@@ -67,6 +67,8 @@ namespace natural {
 		submitInfo.pWaitDstStageMask = vkWaitStages.data();
 		submitInfo.pSignalSemaphores = vkSigSem.data();
 		submitInfo.signalSemaphoreCount = vkSigSem.size();
+		submitInfo.pCommandBuffers = vkCmdBufs.data();
+		submitInfo.commandBufferCount = vkCmdBufs.size();
 		ThrowVk(vkQueueSubmit(impl(m_app)->GetVkGraphicsQueue(), 1, &submitInfo, signalFence ? impl(signalFence)->GetHandle() : VK_NULL_HANDLE));
 	}
 	bool ApplicationListener::Wait(const std::vector<Fence*>& fences, bool waitAll, uint64_t timeoutNs) {

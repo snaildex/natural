@@ -1,6 +1,6 @@
 #pragma once
 #include "../common.h"
-#include "../helpers/helpers.h"
+
 #include "../object/object.h"
 namespace natural {
 	class Resource : public Object {

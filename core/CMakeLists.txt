@@ -13,6 +13,8 @@ endif(MSVC)
 
 target_include_directories (core PUBLIC source)
 
+target_link_libraries(core utils)
+
 find_package(Vulkan REQUIRED)
 target_include_directories(core PRIVATE ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(core ${Vulkan_LIBRARIES})

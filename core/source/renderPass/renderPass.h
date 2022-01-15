@@ -1,6 +1,5 @@
 #pragma once
 #include "../common.h"
-#include "../helpers/helpers.h"
 #include "../enums/format.h"
 #include "../enums/attachmentLoadStoreOp.h"
 #include "../enums/imageLayout.h"

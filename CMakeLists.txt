@@ -11,5 +11,6 @@ add_definitions(-D_USE_MATH_DEFINES -DGLM_ENABLE_EXPERIMENTAL -DGLM_FORCE_CTOR_I
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT test)
 
+add_subdirectory(utils)
 add_subdirectory(core)
 add_subdirectory(test)

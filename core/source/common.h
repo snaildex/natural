@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include <utils.h>
+
 #define GLM_FORCE_SWIZZLE
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

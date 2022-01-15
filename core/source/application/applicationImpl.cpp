@@ -85,10 +85,10 @@ namespace natural {
 		Log("Scanning resources...");
 		LogIndent();
 		auto configs = ScanFiles(".json");
-		for (const fs::path& config : configs) {
+		for (const std::filesystem::path& config : configs) {
 			std::ifstream configFile(config);
-			fs::path cpath = fs::current_path();
-			fs::current_path(config.parent_path());
+			std::filesystem::path cpath = std::filesystem::current_path();
+			std::filesystem::current_path(config.parent_path());
 			json conf = json::parse(configFile);
 			Log("Scanning %s", config.string().data());
 			if (conf.is_array()) {
@@ -97,7 +97,7 @@ namespace natural {
 			}
 			else
 				if (Resource* r = BuildResource(impl(this), conf)) AddResource(r);
-			fs::current_path(cpath);
+			std::filesystem::current_path(cpath);
 			configFile.close();
 		}
 	}

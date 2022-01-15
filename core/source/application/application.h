@@ -1,6 +1,5 @@
 #pragma once
 #include "common.h"
-#include "helpers/helpers.h"
 #include "applicationListener.h"
 #include "../resource/resource.h"
 #include "../enums/format.h"

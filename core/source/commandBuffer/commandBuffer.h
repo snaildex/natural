@@ -2,7 +2,6 @@
 #include "../enums/commandBuffer.h"
 #include "../enums/pipelineBindPoint.h"
 #include "../common.h"
-#include "../helpers/helpers.h"
 namespace natural {
 	class RenderPass;
 	class Framebuffer;

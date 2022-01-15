@@ -1,6 +1,5 @@
 #pragma once
 #include "common.h"
-#include "helpers/helpers.h"
 #include "../resource/resource.h"
 #include "../enums/format.h"
 #include "../enums/pipelineStage.h"
