@@ -4,23 +4,18 @@
 #include "../framebuffer/framebufferImpl.h"
 #include "../pipeline/pipelineImpl.h"
 namespace natural {
-	CommandBuffer::Impl::Impl(Application::Impl* app, VkCommandBuffer handle) {
+	CommandBuffer::Impl::Impl(Application::Impl* app, CommandPool::Impl* pool, VkCommandBufferLevel level) {
 		m_app = app;
-		m_handle = handle;
-	}
-	CommandBuffer::Impl::~Impl() {
-
-	}
-	void CommandBuffer::Impl::Create(Application::Impl* app, CommandPool::Impl* pool, std::vector<std::unique_ptr<CommandBuffer>>& buffers, size_t count, VkCommandBufferLevel level) {
-		std::vector<VkCommandBuffer> bufs;
-		bufs.resize(count);
+		m_pool = pool;
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.commandPool = pool->GetHandle();
 		allocInfo.level = level;
-		allocInfo.commandBufferCount = (uint32_t)bufs.size();
-		ThrowVk(vkAllocateCommandBuffers(app->GetVkDevice(), &allocInfo, bufs.data()));
-		for (VkCommandBuffer b : bufs) buffers.emplace_back(new CommandBuffer::Impl(app, b));
+		allocInfo.commandBufferCount = 1;
+		ThrowVk(vkAllocateCommandBuffers(app->GetVkDevice(), &allocInfo, &m_handle));
+	}
+	CommandBuffer::Impl::~Impl() {
+		vkFreeCommandBuffers(m_app->GetVkDevice(), m_pool->GetHandle(), 1, &m_handle);
 	}
 	void CommandBuffer::Impl::Begin(CommandBufferUsage usage) {
 		VkCommandBufferBeginInfo beginInfo{};

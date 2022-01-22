@@ -8,9 +8,9 @@
 namespace natural {
 	class CommandBuffer::Impl : public CommandBuffer, public HandleBase<VkCommandBuffer> {
 		Application::Impl* m_app;
-		Impl(Application::Impl* app, VkCommandBuffer handle);
+		CommandPool::Impl* m_pool;
 	public:
-		static void Create(Application::Impl* app, CommandPool::Impl* pool, std::vector<std::unique_ptr<CommandBuffer>>& buffers, size_t count, VkCommandBufferLevel level);
+		Impl(Application::Impl* app, CommandPool::Impl* pool, VkCommandBufferLevel level);
 		~Impl();
 		void Begin(CommandBufferUsage usage = 0) override;
 		void End() override;

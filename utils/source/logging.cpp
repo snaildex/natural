@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdarg.h>
+#include "clock.h"
 
 std::list<std::filesystem::path> ScanFiles(const std::string& extension) {
 	std::list<std::filesystem::path> files;
@@ -38,6 +39,7 @@ std::vector<char> ReadFile(const std::filesystem::path& path) {
 }
 
 std::mutex LogLock;
+Clock::TimePoint LogStart = Clock::Now();
 
 int LogIndentLevel;
 void ___LogIndent() { std::lock_guard<std::mutex> g(LogLock); LogIndentLevel++; }
@@ -67,9 +69,9 @@ void ___DLog(const char* file, int line, const char* fmt, ...)
 		else
 			sprintf(buf, "%s", file);
 		if (fmt[0] == '[')
-			sprintf(LogBuf, "[%p][%s]", std::this_thread::get_id(), buf);
+			sprintf(LogBuf, "[%s][%p][%s]", Clock::PrintDuration(Clock::Duration(LogStart, Clock::Now())).c_str(), std::this_thread::get_id(), buf);
 		else
-			sprintf(LogBuf, "[%p][%s] ", std::this_thread::get_id(), buf);
+			sprintf(LogBuf, "[%s][%p][%s] ", Clock::PrintDuration(Clock::Duration(LogStart, Clock::Now())).c_str(), std::this_thread::get_id(), buf);
 		LogFile << LogBuf;
 	}
 	if (line >= 0) for (int i = 0; i < LogIndentLevel; ++i) LogFile << "    ";

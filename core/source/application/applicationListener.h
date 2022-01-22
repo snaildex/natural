@@ -23,6 +23,7 @@ namespace natural {
 		virtual ~ApplicationListener() = default;
 		virtual void Start() = 0;
 		virtual void Update() = 0;
+		virtual void FramebufferResized() = 0;
 		friend class Application;
 		template<class T> T* GetResource(const std::string& name) {
 			return dynamic_cast<T*>(GetResource([&](const Resource* res) {

@@ -24,6 +24,8 @@ namespace natural {
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		m_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
+		glfwSetWindowUserPointer(m_window, this);
+		glfwSetFramebufferSizeCallback(m_window, FramebufferResizeCallback);
 
 		CheckValidationLayersSupport();
 		VkApplicationInfo appInfo{};

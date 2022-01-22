@@ -7,15 +7,15 @@ class TestApp : public ApplicationListener {
 	std::unique_ptr<Pipeline> m_pip;
 	std::vector<std::unique_ptr<Framebuffer>> m_fbufs;
 	std::unique_ptr<CommandPool> m_comPool;
-	std::vector<CommandBuffer*> m_comBufs;
+	std::vector<std::unique_ptr<CommandBuffer>> m_comBufs;
 	std::vector<std::unique_ptr<Semaphore>> m_imageAvailable;
 	std::vector<std::unique_ptr<Semaphore>> m_renderFinished;
 	std::vector<std::unique_ptr<Fence>> m_inFlightFences;
 	std::vector<Fence*> m_imagesInFlight;
 	int m_currentFrame;
 
-public:
-	void Start() {
+	void Init() {
+		for (int i = 0; i < m_comBufs.size(); ++i) m_comBufs[i].reset();
 		AttachmentDesc at;
 		at.Format = GetSwapChainImageFormat();
 		at.LoadOp = AttachmentLoadOp::Clear;
@@ -50,12 +50,13 @@ public:
 			CreateSemaphore(m_renderFinished[i]);
 			CreateFence(m_inFlightFences[i], true);
 		}
-		m_imagesInFlight.resize(m_fbufs.size(), nullptr);
-		m_comPool->CreatePrimaryBuffers(m_fbufs.size());
+		m_imagesInFlight.resize(m_fbufs.size());
+		std::fill(m_imagesInFlight.begin(), m_imagesInFlight.end(), nullptr);
 		m_comBufs.resize(m_fbufs.size());
 		glm::uvec2 resolution = GetSwapChainExtent();
 		for (int i = 0; i < m_comBufs.size(); ++i) {
-			CommandBuffer* comBuf = m_comPool->GetPrimaryBuffer(i);
+			m_comPool->CreatePrimaryBuffer(m_comBufs[i]);
+			CommandBuffer* comBuf = m_comBufs[i].get();
 			comBuf->Begin();
 			comBuf->CmdBeginRenderPass(
 				m_pass.get(),
@@ -67,11 +68,18 @@ public:
 			comBuf->CmdDraw(3, 1, 0, 0);
 			comBuf->CmdEndRenderPass();
 			comBuf->End();
-			m_comBufs[i] = comBuf;
 		}
+	}
+
+public:
+	void Start() override {
+		Init();
 		m_currentFrame = 0;
 	}
-	void Update() {
+	void FramebufferResized() override {
+		Init();
+	}
+	void Update() override {
 		Wait({ m_inFlightFences[m_currentFrame].get() });
 		uint32_t img = NextSwapChainImage(m_imageAvailable[m_currentFrame].get(), nullptr);
 		if (m_imagesInFlight[img]) Wait({ m_imagesInFlight[img] });
@@ -79,7 +87,7 @@ public:
 		m_inFlightFences[m_currentFrame]->Reset();
 		SubmitQueue(
 			{ {m_imageAvailable[m_currentFrame].get(), PipelineStage::ColorAttachmentOutput} },
-			{ m_comBufs[img] },
+			{ m_comBufs[img].get() },
 			{ m_renderFinished[m_currentFrame].get() },
 			m_inFlightFences[m_currentFrame].get()
 		);

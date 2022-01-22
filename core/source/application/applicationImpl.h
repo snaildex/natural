@@ -47,7 +47,8 @@ namespace natural {
 		void CreateLogicalDevice();
 		void CreateSwapChain(int width, int height);
 		void CreateImageViews();
-		
+		static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
+
 	public:
 #ifdef NDEBUG
 		static const bool EnableValidationLayers = false;

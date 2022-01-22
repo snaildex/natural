@@ -221,4 +221,19 @@ namespace natural {
 		vkGetDeviceQueue(m_device, indices.GraphicsFamily.value(), 0, &m_graphicsQueue);
 		vkGetDeviceQueue(m_device, indices.PresentFamily.value(), 0, &m_presentQueue);
 	}
+
+	void Application::Impl::FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
+		auto app = reinterpret_cast<Application::Impl*>(glfwGetWindowUserPointer(window));
+		glfwGetFramebufferSize(window, &width, &height);
+		while (width == 0 || height == 0) {
+			glfwGetFramebufferSize(window, &width, &height);
+			glfwWaitEvents();
+		}
+		ThrowVk(vkDeviceWaitIdle(app->m_device));
+		for (auto iv : app->m_swapChainImageViews) vkDestroyImageView(app->m_device, iv, nullptr);
+		vkDestroySwapchainKHR(app->m_device, app->m_swapChain, nullptr);
+		app->CreateSwapChain(width, height);
+		app->CreateImageViews();
+		app->m_listener->FramebufferResized();
+	}
 }
